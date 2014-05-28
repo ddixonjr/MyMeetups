@@ -9,7 +9,7 @@
 #import "MeetupMainViewController.h"
 #import "EventDetailViewController.h"
 
-#define defaultMeetupURL @"https://api.meetup.com/2/open_events.json?zip=60604&text=mobile&time=,1w&key=3f76761132c39691b755436a18573"
+#define kDefaultMeetupBaseURL @"https://api.meetup.com/2/open_events.json?zip=60604&time=,1w&key=3f76761132c39691b755436a18573&text=mobile"
 
 @interface MeetupMainViewController () <UITableViewDelegate,UITableViewDataSource>
 
@@ -17,38 +17,45 @@
 @property (strong, nonatomic) NSArray *resultsArray;
 @property (weak, nonatomic) IBOutlet UITableView *meetupTableView;
 @property (strong, nonatomic) NSDictionary *currentVenueSetDictionary;
-@property (weak, nonatomic) IBOutlet UITextField *meetupSearchTextView;
+@property (weak, nonatomic) IBOutlet UITextField *meetupSearchTextField;
 
 @end
 
 @implementation MeetupMainViewController
 
+
+#pragma mark - UIViewController Lifecycle Methods
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSURL *currenttURL = [NSURL URLWithString:@"https://api.meetup.com/2/open_events.json?zip=60604&text=mobile&time=,1w&key=3f76761132c39691b755436a18573"];
 
-    NSError *error = [[NSError alloc] init];
-    self.meetupDictionary = [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfURL:defaultURL] options:NSJSONReadingAllowFragments error:&error];
-
-    NSLog(@"meetupDictionary has %@",self.meetupDictionary);
-    self.resultsArray = [self.meetupDictionary objectForKey:@"results"];
-
+    [self loadMeetupResultsWithURLString:kDefaultMeetupBaseURL andTopicSearchString:nil];
 }
 
-- (void)loadMeetupResultsWithURLString:(NSString *)meetupBaseURLString andTopicString:(NSString *)topicString
+
+
+#pragma mark - IBAction Methods
+
+- (IBAction)onMeetupSearchButtonPressed:(id)sender
 {
-
+    if ([self.meetupSearchTextField.text length] > 0)
+    {
+        NSString *topicSearchParameterString = [NSString stringWithFormat:@"&text=%@",self.meetupSearchTextField.text];
+        [self loadMeetupResultsWithURLString:kDefaultMeetupBaseURL andTopicSearchString:topicSearchParameterString];
+        [self.meetupTableView reloadData];
+    }
 }
 
 
-- (IBAction)onMeetupSearchButtonPressed:(id)sender {
-}
+
+#pragma mark - UITableView Delegate Methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return self.resultsArray.count;
 }
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -62,11 +69,29 @@
     return cell;
 }
 
+
+#pragma mark - Storyboard Navigation
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     NSIndexPath *selectedIndexPath = [self.meetupTableView indexPathForSelectedRow];
     EventDetailViewController *eventDetailVC = segue.destinationViewController;
     eventDetailVC.eventDictionary = [self.resultsArray objectAtIndex:selectedIndexPath.row];
+}
+
+#pragma mark - Helper Methods
+
+- (void)loadMeetupResultsWithURLString:(NSString *)meetupBaseURLString andTopicSearchString:(NSString *)topicSearchString
+{
+    NSString *currentURLString = (topicSearchString != nil) ?  [meetupBaseURLString stringByAppendingString:topicSearchString] : meetupBaseURLString;
+    NSLog(@"currentURLString is %@",currentURLString);
+    NSURL *currentURL = [NSURL URLWithString:currentURLString];
+
+    NSError *error = [[NSError alloc] init];
+    self.meetupDictionary = [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfURL:currentURL] options:NSJSONReadingAllowFragments error:&error];
+
+//    NSLog(@"meetupDictionary has %@",self.meetupDictionary);
+    self.resultsArray = [self.meetupDictionary objectForKey:@"results"];
 }
 
 

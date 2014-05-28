@@ -82,7 +82,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Meetup Events" id="XDI-Fe-HS2"/>
                     <connections>
-                        <outlet property="meetupSearchTextView" destination="wvU-zE-LlE" id="Xgp-6Q-GXb"/>
+                        <outlet property="meetupSearchTextField" destination="wvU-zE-LlE" id="nj5-SP-PIn"/>
                         <outlet property="meetupTableView" destination="mAV-kn-OkO" id="b06-iO-xHK"/>
                     </connections>
                 </viewController>

@@ -23,11 +23,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSDictionary *venueDictionary = [self.eventDictionary objectForKey:@"venue"];
     NSDictionary *groupDictionary = [self.eventDictionary objectForKey:@"group"];
 
     self.title = [self.eventDictionary objectForKey:@"name"];
-    self.rsvpLabel.text = [NSString stringWithFormat:@"%d",[self.eventDictionary objectForKey:@"yes_rsvp_count"]];
+    self.rsvpLabel.text = [NSString stringWithFormat:@"%@",[self.eventDictionary objectForKey:@"yes_rsvp_count"]];
     self.descriptionLabel.text = [self.eventDictionary objectForKey:@"description"];
     self.hostingGroupLabel.text = [groupDictionary objectForKey:@"name"];
 
